@@ -8,7 +8,7 @@ import { initialfriends } from "./data/data.json";
 function App() {
   const [friend, setFriends] = useState(initialfriends);
   const [showAddFriend, setShowAddFriend] = useState(false);
-  const [selectedFriend, setSelectedFriend] = useState(null);
+  const [selectedFriend, setSelectedFriend] = useState("");
 
   function handleShowAddFriend() {
     setShowAddFriend((showAddFriend) => !showAddFriend);
@@ -19,14 +19,32 @@ function App() {
     setShowAddFriend(false);
   }
 
-  function handleSelection(friend){
-    setSelectedFriend(friend);
+  function handleSelection(friend) {
+    // setSelectedFriend(friend);
+    setSelectedFriend((selected) => (selected.id === friend.id ? "" : friend));
+    setShowAddFriend(false);
+  }
+
+  function handleSplitBill(value) {
+    setFriends((friends) =>
+      friends.map((friend) =>
+        friend.id === selectedFriend.id
+          ? { ...friend, balance: friend.balance + value }
+          : friend,
+      ),
+    );
+
+    setSelectedFriend("");
   }
 
   return (
     <div className="app">
       <div className="sidebar">
-        <FriendsList friends={friend} onSelection={handleSelection} />
+        <FriendsList
+          friends={friend}
+          selectedFriend={selectedFriend}
+          onSelection={handleSelection}
+        />
 
         {showAddFriend && <FormAddFriend onAddFriend={handleAddFriend} />}
 
@@ -34,7 +52,12 @@ function App() {
           {showAddFriend === false ? "Add friend" : "Close"}
         </Button>
       </div>
-      {selectedFriend && <FormSplitBill selectedFriend={selectedFriend}/>}
+      {selectedFriend && (
+        <FormSplitBill
+          selectedFriend={selectedFriend}
+          onSplitBill={handleSplitBill}
+        />
+      )}
     </div>
   );
 }
